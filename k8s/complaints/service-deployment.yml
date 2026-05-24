@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: complaint-service
+  namespace: civitrack
+  labels:
+    app: complaint-service
+    tier: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: complaint-service
+  template:
+    metadata:
+      labels:
+        app: complaint-service
+        tier: backend
+    spec:
+      containers:
+        - name: complaint-service
+          image: carlos15976/civitrack-complaints:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3002
+          env:
+            - name: PORT
+              value: "3002"
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: civitrack-secrets
+                  key: complaint-db-url
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: civitrack-secrets
+                  key: jwt-secret
+            # Uncomment for demo mode (SLA expires in ~36s)
+            # - name: SLA_HOURS
+            #   value: "0.01"
+          readinessProbe:
+            httpGet:
+              path: /complaints/health
+              port: 3002
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /complaints/health
+              port: 3002
+            initialDelaySeconds: 30
+            periodSeconds: 20
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "300m"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: complaint-service
+  namespace: civitrack
+  labels:
+    app: complaint-service
+spec:
+  selector:
+    app: complaint-service
+  ports:
+    - port: 3002
+      targetPort: 3002
+  type: ClusterIP

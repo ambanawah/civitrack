@@ -1,0 +1,129 @@
+version: '3.8'
+
+services:
+
+  # ──────────────────────────────────────────
+  # DATABASES
+  # ──────────────────────────────────────────
+
+  auth-db:
+    image: postgres:15-alpine
+    container_name: civitrack_auth_db
+    environment:
+      POSTGRES_USER: auth_user
+      POSTGRES_PASSWORD: auth_pass
+      POSTGRES_DB: auth_db
+    volumes:
+      - auth_db_data:/var/lib/postgresql/data
+    networks:
+      - civitrack_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U auth_user -d auth_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  complaint-db:
+    image: postgres:15-alpine
+    container_name: civitrack_complaint_db
+    environment:
+      POSTGRES_USER: complaint_user
+      POSTGRES_PASSWORD: complaint_pass
+      POSTGRES_DB: complaint_db
+    volumes:
+      - complaint_db_data:/var/lib/postgresql/data
+    networks:
+      - civitrack_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U complaint_user -d complaint_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # ──────────────────────────────────────────
+  # SERVICES
+  # ──────────────────────────────────────────
+
+  auth-service:
+    build:
+      context: ./auth-service
+      dockerfile: Dockerfile
+    container_name: civitrack_auth
+    environment:
+      DATABASE_URL: postgresql://auth_user:auth_pass@auth-db:5432/auth_db
+      JWT_SECRET: civitrack_super_secret_key_change_in_production
+      JWT_EXPIRES_IN: 7d
+      PORT: 3001
+    ports:
+      - "3001:3001"
+    depends_on:
+      auth-db:
+        condition: service_healthy
+    networks:
+      - civitrack_net
+    restart: unless-stopped
+
+  complaint-service:
+    build:
+      context: ./complaint-service
+      dockerfile: Dockerfile
+    container_name: civitrack_complaints
+    environment:
+      DATABASE_URL: postgresql://complaint_user:complaint_pass@complaint-db:5432/complaint_db
+      JWT_SECRET: civitrack_super_secret_key_change_in_production
+      PORT: 3002
+      # SLA_HOURS: 0.01   # ← UNCOMMENT FOR DEMO MODE (expires in ~36s)
+    ports:
+      - "3002:3002"
+    depends_on:
+      complaint-db:
+        condition: service_healthy
+    networks:
+      - civitrack_net
+    restart: unless-stopped
+
+  gateway:
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+    container_name: civitrack_gateway
+    environment:
+      PORT: 3000
+      JWT_SECRET: civitrack_super_secret_key_change_in_production
+      AUTH_SERVICE_URL: http://auth-service:3001
+      COMPLAINT_SERVICE_URL: http://complaint-service:3002
+    ports:
+      - "3000:3000"
+    depends_on:
+      - auth-service
+      - complaint-service
+    networks:
+      - civitrack_net
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: civitrack_frontend
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:3000
+    ports:
+      - "3004:3004"
+    depends_on:
+      - gateway
+    networks:
+      - civitrack_net
+    restart: unless-stopped
+
+# ──────────────────────────────────────────
+# VOLUMES & NETWORK
+# ──────────────────────────────────────────
+
+volumes:
+  auth_db_data:
+  complaint_db_data:
+
+networks:
+  civitrack_net:
+    driver: bridge

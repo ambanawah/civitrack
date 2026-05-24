@@ -1,0 +1,75 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: complaint-db-pvc
+  namespace: civitrack
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: complaint-db
+  namespace: civitrack
+  labels:
+    app: complaint-db
+    tier: database
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: complaint-db
+  template:
+    metadata:
+      labels:
+        app: complaint-db
+        tier: database
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:15-alpine
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_USER
+              value: "complaint_user"
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: civitrack-secrets
+                  key: complaint-db-password
+            - name: POSTGRES_DB
+              value: "complaint_db"
+          volumeMounts:
+            - name: complaint-db-storage
+              mountPath: /var/lib/postgresql/data
+          readinessProbe:
+            exec:
+              command: ["pg_isready", "-U", "complaint_user", "-d", "complaint_db"]
+            initialDelaySeconds: 5
+            periodSeconds: 5
+      volumes:
+        - name: complaint-db-storage
+          persistentVolumeClaim:
+            claimName: complaint-db-pvc
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: complaint-db-service
+  namespace: civitrack
+  labels:
+    app: complaint-db
+spec:
+  selector:
+    app: complaint-db
+  ports:
+    - port: 5432
+      targetPort: 5432
+  type: ClusterIP

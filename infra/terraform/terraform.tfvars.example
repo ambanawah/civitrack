@@ -1,0 +1,9 @@
+# Rename this file to terraform.tfvars and fill in your values
+# NEVER commit terraform.tfvars to Git (it's in .gitignore)
+
+do_token            = "your_digitalocean_api_token_here"
+ssh_public_key_path = "~/.ssh/id_rsa.pub"
+region              = "fra1"
+droplet_size        = "s-2vcpu-2gb"
+repo_url            = "https://github.com/ambanawah/civitrack.git"
+jwt_secret          = "civitrack_super_secret_key_change_in_production"

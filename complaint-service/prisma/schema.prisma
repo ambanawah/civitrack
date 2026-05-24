@@ -1,0 +1,80 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Complaint {
+  id             String         @id @default(uuid())
+
+  // Citizen snapshot (duplicated — no cross-service join needed)
+  citizenId      String
+  citizenEmail   String
+  citizenName    String
+
+  // Complaint details
+  title          String
+  description    String
+  department     Department
+  category       String         // auto-classified from keywords
+  priority       Priority       @default(MEDIUM)
+  status         Status         @default(PENDING)
+
+  // SLA tracking
+  slaHours       Float          // hours allowed to resolve
+  slaDeadline    DateTime       // createdAt + slaHours
+  slaBreached    Boolean        @default(false)
+
+  // Officer assignment
+  assignedOfficerId   String?
+  assignedOfficerName String?
+
+  // Event log
+  events         ComplaintEvent[]
+
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+}
+
+model ComplaintEvent {
+  id          String    @id @default(uuid())
+  complaintId String
+  complaint   Complaint @relation(fields: [complaintId], references: [id])
+  actorId     String
+  actorName   String
+  actorRole   String
+  action      String    // "STATUS_CHANGED", "ASSIGNED", "NOTE_ADDED"
+  oldValue    String?
+  newValue    String?
+  note        String?
+  createdAt   DateTime  @default(now())
+}
+
+enum Department {
+  WATER
+  ELECTRICITY
+  ROADS
+  HEALTH
+  SANITATION
+  EDUCATION
+  SECURITY
+  OTHER
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum Status {
+  PENDING
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+  REJECTED
+}

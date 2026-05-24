@@ -1,0 +1,92 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gateway
+  namespace: civitrack
+  labels:
+    app: gateway
+    tier: edge
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gateway
+  template:
+    metadata:
+      labels:
+        app: gateway
+        tier: edge
+    spec:
+      containers:
+        - name: gateway
+          image: carlos15976/civitrack-gateway:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+          env:
+            - name: PORT
+              value: "3000"
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: civitrack-secrets
+                  key: jwt-secret
+            - name: AUTH_SERVICE_URL
+              value: "http://auth-service:3001"
+            - name: COMPLAINT_SERVICE_URL
+              value: "http://complaint-service:3002"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 20
+            periodSeconds: 15
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "50m"
+            limits:
+              memory: "128Mi"
+              cpu: "200m"
+
+---
+# ClusterIP for internal access
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway
+  namespace: civitrack
+  labels:
+    app: gateway
+spec:
+  selector:
+    app: gateway
+  ports:
+    - port: 3000
+      targetPort: 3000
+  type: ClusterIP
+
+---
+# NodePort to expose gateway to outside world
+# Access at: http://<minikube-ip>:30000
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway-external
+  namespace: civitrack
+  labels:
+    app: gateway
+spec:
+  selector:
+    app: gateway
+  ports:
+    - port: 3000
+      targetPort: 3000
+      nodePort: 30000
+  type: NodePort

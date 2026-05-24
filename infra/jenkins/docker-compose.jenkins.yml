@@ -1,0 +1,31 @@
+version: '3.8'
+
+# Run this to get Jenkins running locally for screenshots
+# Command: docker-compose -f infra/jenkins/docker-compose.jenkins.yml up -d
+
+services:
+  jenkins:
+    image: jenkins/jenkins:lts
+    container_name: civitrack_jenkins
+    privileged: true
+    user: root
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    volumes:
+      # Persist Jenkins data
+      - jenkins_data:/var/jenkins_home
+      # Give Jenkins access to Docker on host
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /usr/bin/docker:/usr/bin/docker
+    environment:
+      - JAVA_OPTS=-Djenkins.install.runSetupWizard=false
+    networks:
+      - jenkins_net
+
+volumes:
+  jenkins_data:
+
+networks:
+  jenkins_net:
+    driver: bridge
