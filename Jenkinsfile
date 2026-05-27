@@ -21,7 +21,7 @@ pipeline {
         // Fail if pipeline takes more than 20 minutes
         timeout(time: 20, unit: 'MINUTES')
         // Add timestamps to console output
-        timestamps()
+        
     }
 
     stages {
