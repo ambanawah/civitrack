@@ -32,7 +32,7 @@ pipeline {
         stage('Build Services') {
             steps {
                 echo '🐳 Building Docker images...'
-                sh 'docker compose build --no-cache'
+                sh 'docker-compose build'
             }
         }
 
@@ -40,11 +40,11 @@ pipeline {
             steps {
                 echo '🧪 Running health tests...'
                 sh '''
-                    docker compose up -d
+                    docker-compose up -d
                     sleep 20
                     curl -s -o /dev/null -w "Gateway: %{http_code}\n" http://localhost:3000/health || echo "Gateway: checking..."
                     curl -s -o /dev/null -w "Auth: %{http_code}\n" http://localhost:3001/auth/health || echo "Auth: checking..."
-                    docker compose down
+                    docker-compose down
                 '''
             }
         }
