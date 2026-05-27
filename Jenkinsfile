@@ -41,7 +41,7 @@ pipeline {
         echo '🧪 Running health tests...'
         sh '''
             docker-compose down --remove-orphans || true
-            docker-compose up -d
+            docker-compose up -d auth-db complaint-db auth-service complaint-service gateway frontend
             sleep 20
             curl -s -o /dev/null -w "Gateway: %{http_code}\n" http://localhost:3000/health || echo "Gateway: checking..."
             curl -s -o /dev/null -w "Auth: %{http_code}\n" http://localhost:3001/auth/health || echo "Auth: checking..."
@@ -50,12 +50,12 @@ pipeline {
     }
 }
 
-        stage('Deploy') {
-            steps {
-                echo '🚀 Deploying CiviTrack...'
-                sh 'docker compose up -d'
-            }
-        }
+       stage('Deploy') {
+    steps {
+        echo '🚀 Deploying CiviTrack...'
+        sh 'docker-compose up -d auth-db complaint-db auth-service complaint-service gateway frontend'
+    }
+}
 
         stage('Smoke Test') {
             steps {
