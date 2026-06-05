@@ -1,0 +1,155 @@
+---
+# ============================================================
+# Playbook 2: deploy-civitrack.yml
+# Purpose   : Clone repo and deploy CiviTrack with Docker Compose
+# Run with  : ansible-playbook playbooks/deploy-civitrack.yml
+# ============================================================
+
+- name: Deploy CiviTrack Application
+  hosts: civitrack_servers
+  become: yes
+  gather_facts: yes
+
+  vars:
+    app_dir: /opt/civitrack
+    repo_url: https://github.com/ambanawah/civitrack.git
+    jwt_secret: civitrack_super_secret_key_change_in_production
+    branch: main
+
+  tasks:
+
+    # ── Clone / update repository ─────────────────────────
+    - name: Check if app directory exists
+      stat:
+        path: "{{ app_dir }}"
+      register: app_dir_stat
+
+    - name: Clone CiviTrack repository
+      git:
+        repo: "{{ repo_url }}"
+        dest: "{{ app_dir }}"
+        branch: "{{ branch }}"
+        force: yes
+      when: not app_dir_stat.stat.exists
+
+    - name: Pull latest changes
+      git:
+        repo: "{{ repo_url }}"
+        dest: "{{ app_dir }}"
+        branch: "{{ branch }}"
+        update: yes
+        force: yes
+      when: app_dir_stat.stat.exists
+
+    # ── Create monitoring config ──────────────────────────
+    - name: Create monitoring directory
+      file:
+        path: "{{ app_dir }}/monitoring"
+        state: directory
+        mode: '0755'
+
+    - name: Create Prometheus config
+      copy:
+        content: |
+          global:
+            scrape_interval: 15s
+            evaluation_interval: 15s
+
+          scrape_configs:
+            - job_name: 'gateway'
+              static_configs:
+                - targets: ['gateway:3000']
+            - job_name: 'auth-service'
+              static_configs:
+                - targets: ['auth-service:3001']
+            - job_name: 'complaint-service'
+              static_configs:
+                - targets: ['complaint-service:3002']
+            - job_name: 'prometheus'
+              static_configs:
+                - targets: ['localhost:9090']
+        dest: "{{ app_dir }}/monitoring/prometheus.yml"
+        mode: '0644'
+
+    # ── Stop existing containers ──────────────────────────
+    - name: Stop existing containers (if running)
+      command: docker-compose down --remove-orphans
+      args:
+        chdir: "{{ app_dir }}"
+      ignore_errors: yes
+
+    # ── Start application ─────────────────────────────────
+    - name: Build and start CiviTrack
+      command: docker-compose up --build -d
+      args:
+        chdir: "{{ app_dir }}"
+      register: deploy_result
+
+    - name: Print deployment output
+      debug:
+        msg: "{{ deploy_result.stdout_lines }}"
+
+    # ── Wait for services ─────────────────────────────────
+    - name: Wait for gateway to be ready
+      uri:
+        url: "http://localhost:3000/health"
+        method: GET
+        status_code: 200
+      register: health_check
+      until: health_check.status == 200
+      retries: 12
+      delay: 10
+      ignore_errors: yes
+
+    # ── Verify deployment ─────────────────────────────────
+    - name: Check running containers
+      command: docker-compose ps
+      args:
+        chdir: "{{ app_dir }}"
+      register: containers
+
+    - name: Print running containers
+      debug:
+        msg: "{{ containers.stdout_lines }}"
+
+    # ── Create systemd service ────────────────────────────
+    - name: Create CiviTrack systemd service
+      copy:
+        content: |
+          [Unit]
+          Description=CiviTrack Application
+          After=docker.service
+          Requires=docker.service
+
+          [Service]
+          Type=simple
+          WorkingDirectory={{ app_dir }}
+          ExecStart=/usr/local/bin/docker-compose up
+          ExecStop=/usr/local/bin/docker-compose down
+          Restart=always
+          RestartSec=10
+
+          [Install]
+          WantedBy=multi-user.target
+        dest: /etc/systemd/system/civitrack.service
+        mode: '0644'
+
+    - name: Enable CiviTrack service on boot
+      systemd:
+        name: civitrack
+        enabled: yes
+        daemon_reload: yes
+
+    # ── Final status ──────────────────────────────────────
+    - name: Print deployment success message
+      debug:
+        msg:
+          - "======================================"
+          - " CiviTrack Deployed Successfully!"
+          - "======================================"
+          - " Frontend  : http://{{ ansible_host }}:3004"
+          - " Gateway   : http://{{ ansible_host }}:3000"
+          - " Health    : http://{{ ansible_host }}:3000/health"
+          - " Prometheus: http://{{ ansible_host }}:9090"
+          - " Grafana   : http://{{ ansible_host }}:3003"
+          - "======================================"

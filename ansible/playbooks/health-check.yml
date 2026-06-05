@@ -1,0 +1,102 @@
+---
+# ============================================================
+# Playbook 3: health-check.yml
+# Purpose   : Check health of all CiviTrack services
+# Run with  : ansible-playbook playbooks/health-check.yml
+# ============================================================
+
+- name: CiviTrack Health Check
+  hosts: civitrack_servers
+  become: yes
+  gather_facts: yes
+
+  vars:
+    app_dir: /opt/civitrack
+
+  tasks:
+
+    - name: Check Docker service status
+      systemd:
+        name: docker
+      register: docker_status
+
+    - name: Print Docker status
+      debug:
+        msg: "Docker is {{ docker_status.status.ActiveState }}"
+
+    - name: List running containers
+      command: docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+      register: containers
+      changed_when: false
+
+    - name: Print containers
+      debug:
+        msg: "{{ containers.stdout_lines }}"
+
+    - name: Check gateway health
+      uri:
+        url: "http://localhost:3000/health"
+        method: GET
+        status_code: 200
+        timeout: 10
+      register: gateway_health
+      ignore_errors: yes
+
+    - name: Print gateway health
+      debug:
+        msg: "Gateway: {{ 'UP' if gateway_health.status == 200 else 'DOWN' }}"
+
+    - name: Check auth service health
+      uri:
+        url: "http://localhost:3001/auth/health"
+        method: GET
+        status_code: 200
+        timeout: 10
+      register: auth_health
+      ignore_errors: yes
+
+    - name: Print auth health
+      debug:
+        msg: "Auth Service: {{ 'UP' if auth_health.status == 200 else 'DOWN' }}"
+
+    - name: Check complaint service health
+      uri:
+        url: "http://localhost:3002/complaints/health"
+        method: GET
+        status_code: 200
+        timeout: 10
+      register: complaint_health
+      ignore_errors: yes
+
+    - name: Print complaint health
+      debug:
+        msg: "Complaint Service: {{ 'UP' if complaint_health.status == 200 else 'DOWN' }}"
+
+    - name: Check disk usage
+      command: df -h /
+      register: disk_usage
+      changed_when: false
+
+    - name: Print disk usage
+      debug:
+        msg: "{{ disk_usage.stdout_lines }}"
+
+    - name: Check memory usage
+      command: free -h
+      register: memory_usage
+      changed_when: false
+
+    - name: Print memory usage
+      debug:
+        msg: "{{ memory_usage.stdout_lines }}"
+
+    - name: Health check summary
+      debug:
+        msg:
+          - "======================================"
+          - " CiviTrack Health Summary"
+          - "======================================"
+          - " Gateway        : {{ 'UP ✅' if gateway_health.status == 200 else 'DOWN ❌' }}"
+          - " Auth Service   : {{ 'UP ✅' if auth_health.status == 200 else 'DOWN ❌' }}"
+          - " Complaint Svc  : {{ 'UP ✅' if complaint_health.status == 200 else 'DOWN ❌' }}"
+          - "======================================"

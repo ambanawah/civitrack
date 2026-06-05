@@ -1,0 +1,144 @@
+---
+# ============================================================
+# Playbook 1: install-docker.yml
+# Purpose   : Install Docker, Docker Compose, and Git on VPS
+# Run with  : ansible-playbook playbooks/install-docker.yml
+# ============================================================
+
+- name: Install Docker and Dependencies
+  hosts: civitrack_servers
+  become: yes
+  gather_facts: yes
+
+  vars:
+    docker_compose_version: "v2.24.0"
+    required_packages:
+      - curl
+      - git
+      - wget
+      - unzip
+      - apt-transport-https
+      - ca-certificates
+      - gnupg
+      - lsb-release
+      - python3-pip
+
+  tasks:
+
+    # ── System update ─────────────────────────────────────
+    - name: Update apt package cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Upgrade all packages
+      apt:
+        upgrade: dist
+        autoremove: yes
+
+    # ── Install required packages ─────────────────────────
+    - name: Install required system packages
+      apt:
+        name: "{{ required_packages }}"
+        state: present
+
+    # ── Install Docker ────────────────────────────────────
+    - name: Check if Docker is already installed
+      command: docker --version
+      register: docker_check
+      ignore_errors: yes
+      changed_when: false
+
+    - name: Download Docker installation script
+      get_url:
+        url: https://get.docker.com
+        dest: /tmp/install-docker.sh
+        mode: '0755'
+      when: docker_check.rc != 0
+
+    - name: Install Docker
+      command: sh /tmp/install-docker.sh
+      when: docker_check.rc != 0
+
+    - name: Start and enable Docker service
+      systemd:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Verify Docker installation
+      command: docker --version
+      register: docker_version
+      changed_when: false
+
+    - name: Print Docker version
+      debug:
+        msg: "Docker installed: {{ docker_version.stdout }}"
+
+    # ── Install Docker Compose ────────────────────────────
+    - name: Check if Docker Compose is already installed
+      command: docker-compose --version
+      register: compose_check
+      ignore_errors: yes
+      changed_when: false
+
+    - name: Download Docker Compose
+      get_url:
+        url: "https://github.com/docker/compose/releases/download/{{ docker_compose_version }}/docker-compose-linux-x86_64"
+        dest: /usr/local/bin/docker-compose
+        mode: '0755'
+      when: compose_check.rc != 0
+
+    - name: Verify Docker Compose installation
+      command: docker-compose --version
+      register: compose_version
+      changed_when: false
+
+    - name: Print Docker Compose version
+      debug:
+        msg: "Docker Compose installed: {{ compose_version.stdout }}"
+
+    # ── Configure Docker ──────────────────────────────────
+    - name: Create Docker daemon configuration
+      copy:
+        content: |
+          {
+            "log-driver": "json-file",
+            "log-opts": {
+              "max-size": "100m",
+              "max-file": "3"
+            }
+          }
+        dest: /etc/docker/daemon.json
+        mode: '0644'
+      notify: Restart Docker
+
+    # ── Firewall setup ────────────────────────────────────
+    - name: Allow SSH through firewall
+      ufw:
+        rule: allow
+        port: '22'
+        proto: tcp
+
+    - name: Allow CiviTrack ports through firewall
+      ufw:
+        rule: allow
+        port: "{{ item }}"
+        proto: tcp
+      loop:
+        - '3000'  # Gateway
+        - '3003'  # Grafana
+        - '3004'  # Frontend
+        - '9090'  # Prometheus
+
+    - name: Enable UFW firewall
+      ufw:
+        state: enabled
+        policy: deny
+        direction: incoming
+
+  handlers:
+    - name: Restart Docker
+      systemd:
+        name: docker
+        state: restarted
