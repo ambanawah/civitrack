@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe, Logger } from '@nestjs/common';
-import { swaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
@@ -22,15 +22,15 @@ async function bootstrap() {
   // Swagger
   const config = new DocumentBuilder()
     .setTitle('CiviTrack API')
-     .setDescription('Civic Complaint Management System API')
+    .setDescription('Civic Complaint Management System API')
     .setVersion('1.0')
     .addBearerAuth()
     .addTag('auth', 'Authentication endpoints')
     .addTag('complaints', 'Complaint management endpoints')
     .build();
 
-    const document = swaggerModule.createDocument(app, config);
-    swaggerModule.setup('api-docs', app, document);
+    const document = SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup('api-docs', app, document);
 
   const port = process.env.PORT || 3000;
   await app.listen(port);
