@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coverage generated="1780717582881" clover="3.2.0">
+  <project timestamp="1780717582882" name="All files">
+    <metrics statements="158" coveredstatements="57" conditionals="61" coveredconditionals="26" methods="35" coveredmethods="10" elements="254" coveredelements="93" complexity="0" loc="158" ncloc="158" packages="5" files="10" classes="10"/>
+    <package name="complaints">
+      <metrics statements="97" coveredstatements="54" conditionals="41" coveredconditionals="26" methods="25" coveredmethods="10"/>
+      <file name="classification.engine.ts" path="C:\Users\CARLOS\Downloads\civitrack-final2\complaint-service\src\complaints\classification.engine.ts">
+        <metrics statements="29" coveredstatements="29" conditionals="23" coveredconditionals="21" methods="2" coveredmethods="2"/>
+        <line num="12" count="2" type="stmt"/>
+        <line num="49" count="2" type="stmt"/>
+        <line num="54" count="2" type="stmt"/>
+        <line num="59" count="2" type="stmt"/>
+        <line num="70" count="2" type="stmt"/>
+        <line num="75" count="22" type="stmt"/>
+        <line num="76" count="22" type="stmt"/>
+        <line num="79" count="22" type="cond" truecount="2" falsecount="0"/>
+        <line num="80" count="22" type="stmt"/>
+        <line num="82" count="22" type="stmt"/>
+        <line num="83" count="264" type="stmt"/>
+        <line num="84" count="264" type="cond" truecount="2" falsecount="0"/>
+        <line num="85" count="68" type="cond" truecount="2" falsecount="0"/>
+        <line num="89" count="22" type="cond" truecount="4" falsecount="0"/>
+        <line num="90" count="18" type="stmt"/>
+        <line num="94" count="22" type="stmt"/>
+        <line num="96" count="22" type="stmt"/>
+        <line num="97" count="120" type="cond" truecount="2" falsecount="0"/>
+        <line num="98" count="3" type="stmt"/>
+        <line num="99" count="3" type="stmt"/>
+        <line num="103" count="22" type="cond" truecount="2" falsecount="0"/>
+        <line num="104" count="19" type="stmt"/>
+        <line num="105" count="177" type="cond" truecount="2" falsecount="0"/>
+        <line num="106" count="7" type="stmt"/>
+        <line num="107" count="7" type="stmt"/>
+        <line num="113" count="22" type="stmt"/>
+        <line num="124" count="22" type="cond" truecount="1" falsecount="1"/>
+        <line num="128" count="22" type="cond" truecount="4" falsecount="1"/>
+        <line num="132" count="22" type="stmt"/>
+      </file>
+      <file name="complaints.controller.ts" path="C:\Users\CARLOS\Downloads\civitrack-final2\complaint-service\src\complaints\complaints.controller.ts">
+        <metrics statements="29" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="11" coveredmethods="0"/>
+        <line num="1" count="0" type="stmt"/>
+        <line num="13" count="0" type="stmt"/>
+        <line num="14" count="0" type="stmt"/>
+        <line num="15" count="0" type="stmt"/>
+        <line num="16" count="0" type="stmt"/>
+        <line num="17" count="0" type="stmt"/>
+        <line num="18" count="0" type="stmt"/>
+        <line num="22" count="0" type="stmt"/>
+        <line num="23" count="0" type="stmt"/>
+        <line num="30" count="0" type="stmt"/>
+        <line num="35" count="0" type="stmt"/>
+        <line num="44" count="0" type="stmt"/>
+        <line num="45" count="0" type="stmt"/>
+        <line num="53" count="0" type="stmt"/>
+        <line num="54" count="0" type="stmt"/>
+        <line num="63" count="0" type="stmt"/>
+        <line num="64" count="0" type="stmt"/>
+        <line num="73" count="0" type="stmt"/>
+        <line num="74" count="0" type="stmt"/>
+        <line num="83" count="0" type="stmt"/>
+        <line num="84" count="0" type="stmt"/>
+        <line num="92" count="0" type="stmt"/>
+        <line num="93" count="0" type="stmt"/>
+        <line num="102" count="0" type="stmt"/>
+        <line num="108" count="0" type="stmt"/>
+        <line num="117" count="0" type="stmt"/>
+        <line num="122" count="0" type="stmt"/>
+        <line num="129" count="0" type="stmt"/>
+        <line num="130" count="0" type="stmt"/>
+      </file>
+      <file name="complaints.service.ts" path="C:\Users\CARLOS\Downloads\civitrack-final2\complaint-service\src\complaints\complaints.service.ts">
+        <metrics statements="39" coveredstatements="25" conditionals="18" coveredconditionals="5" methods="12" coveredmethods="8"/>
+        <line num="1" count="1" type="stmt"/>
+        <line num="6" count="1" type="stmt"/>
+        <line num="10" count="1" type="stmt"/>
+        <line num="20" count="1" type="stmt"/>
+        <line num="21" count="10" type="stmt"/>
+        <line num="28" count="4" type="stmt"/>
+        <line num="34" count="4" type="stmt"/>
+        <line num="35" count="4" type="stmt"/>
+        <line num="39" count="4" type="stmt"/>
+        <line num="65" count="4" type="stmt"/>
+        <line num="79" count="0" type="stmt"/>
+        <line num="81" count="0" type="stmt"/>
+        <line num="83" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="84" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="85" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="86" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="87" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="89" count="0" type="stmt"/>
+        <line num="100" count="1" type="stmt"/>
+        <line num="102" count="1" type="stmt"/>
+        <line num="113" count="0" type="stmt"/>
+        <line num="115" count="0" type="stmt"/>
+        <line num="126" count="4" type="stmt"/>
+        <line num="131" count="4" type="cond" truecount="2" falsecount="0"/>
+        <line num="132" count="3" type="stmt"/>
+        <line num="139" count="2" type="stmt"/>
+        <line num="141" count="2" type="stmt"/>
+        <line num="160" count="2" type="stmt"/>
+        <line num="167" count="0" type="stmt"/>
+        <line num="169" count="0" type="stmt"/>
+        <line num="194" count="2" type="stmt"/>
+        <line num="197" count="2" type="stmt"/>
+        <line num="211" count="0" type="stmt"/>
+        <line num="213" count="0" type="stmt"/>
+        <line num="226" count="1" type="stmt"/>
+        <line num="228" count="1" type="stmt"/>
+        <line num="236" count="1" type="stmt"/>
+        <line num="241" count="1" type="stmt"/>
+        <line num="247" count="2" type="stmt"/>
+      </file>
+    </package>
+    <package name="complaints.dto">
+      <metrics statements="28" coveredstatements="0" conditionals="4" coveredconditionals="0" methods="2" coveredmethods="0"/>
+      <file name="assign-officer.dto.ts" path="C:\Users\CARLOS\Downloads\civitrack-final2\complaint-service\src\complaints\dto\assign-officer.dto.ts">
+        <metrics statements="4" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+        <line num="1" count="0" type="stmt"/>
+        <line num="3" count="0" type="stmt"/>
+        <line num="6" count="0" type="stmt"/>
+        <line num="10" count="0" type="stmt"/>
+      </file>
+      <file name="create-complaint.dto.ts" path="C:\Users\CARLOS\Downloads\civitrack-final2\complaint-service\src\complaints\dto\create-complaint.dto.ts">
+        <metrics statements="14" coveredstatements="0" conditionals="2" coveredconditionals="0" methods="1" coveredmethods="0"/>
+        <line num="1" count="0" type="stmt"/>
+        <line num="10" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="11" count="0" type="stmt"/>
+        <line num="12" count="0" type="stmt"/>
+        <line num="13" count="0" type="stmt"/>
+        <line num="14" count="0" type="stmt"/>
+        <line num="15" count="0" type="stmt"/>
+        <line num="16" count="0" type="stmt"/>
+        <line num="17" count="0" type="stmt"/>
+        <line num="18" count="0" type="stmt"/>
+        <line num="21" count="0" type="stmt"/>
+        <line num="26" count="0" type="stmt"/>
+        <line num="32" count="0" type="stmt"/>
+        <line num="36" count="0" type="stmt"/>
+      </file>
+      <file name="update-status.dto.ts" path="C:\Users\CARLOS\Downloads\civitrack-final2\complaint-service\src\complaints\dto\update-status.dto.ts">
+        <metrics statements="10" coveredstatements="0" conditionals="2" coveredconditionals="0" methods="1" coveredmethods="0"/>
+        <line num="1" count="0" type="stmt"/>
+        <line num="3" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="4" count="0" type="stmt"/>
+        <line num="5" count="0" type="stmt"/>
+        <line num="6" count="0" type="stmt"/>
+        <line num="7" count="0" type="stmt"/>
+        <line num="8" count="0" type="stmt"/>
+        <line num="11" count="0" type="stmt"/>
+        <line num="13" count="0" type="stmt"/>
+        <line num="17" count="0" type="stmt"/>
+      </file>
+    </package>
+    <package name="complaints.guards">
+      <metrics statements="19" coveredstatements="0" conditionals="12" coveredconditionals="0" methods="4" coveredmethods="0"/>
+      <file name="jwt-auth.guard.ts" path="C:\Users\CARLOS\Downloads\civitrack-final2\complaint-service\src\complaints\guards\jwt-auth.guard.ts">
+        <metrics statements="3" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+        <line num="1" count="0" type="stmt"/>
+        <line num="2" count="0" type="stmt"/>
+        <line num="5" count="0" type="stmt"/>
+      </file>
+      <file name="roles.guard.ts" path="C:\Users\CARLOS\Downloads\civitrack-final2\complaint-service\src\complaints\guards\roles.guard.ts">
+        <metrics statements="16" coveredstatements="0" conditionals="12" coveredconditionals="0" methods="4" coveredmethods="0"/>
+        <line num="1" count="0" type="stmt"/>
+        <line num="7" count="0" type="stmt"/>
+        <line num="9" count="0" type="stmt"/>
+        <line num="11" count="0" type="stmt"/>
+        <line num="12" count="0" type="stmt"/>
+        <line num="13" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="14" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="19" count="0" type="stmt"/>
+        <line num="20" count="0" type="stmt"/>
+        <line num="23" count="0" type="stmt"/>
+        <line num="28" count="0" type="cond" truecount="0" falsecount="4"/>
+        <line num="29" count="0" type="stmt"/>
+        <line num="32" count="0" type="stmt"/>
+        <line num="34" count="0" type="cond" truecount="0" falsecount="4"/>
+        <line num="35" count="0" type="stmt"/>
+        <line num="40" count="0" type="stmt"/>
+      </file>
+    </package>
+    <package name="complaints.strategies">
+      <metrics statements="9" coveredstatements="0" conditionals="4" coveredconditionals="0" methods="2" coveredmethods="0"/>
+      <file name="jwt.strategy.ts" path="C:\Users\CARLOS\Downloads\civitrack-final2\complaint-service\src\complaints\strategies\jwt.strategy.ts">
+        <metrics statements="9" coveredstatements="0" conditionals="4" coveredconditionals="0" methods="2" coveredmethods="0"/>
+        <line num="1" count="0" type="stmt"/>
+        <line num="2" count="0" type="stmt"/>
+        <line num="3" count="0" type="stmt"/>
+        <line num="4" count="0" type="stmt"/>
+        <line num="7" count="0" type="stmt"/>
+        <line num="9" count="0" type="stmt"/>
+        <line num="17" count="0" type="cond" truecount="0" falsecount="4"/>
+        <line num="18" count="0" type="stmt"/>
+        <line num="20" count="0" type="stmt"/>
+      </file>
+    </package>
+    <package name="prisma">
+      <metrics statements="5" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="2" coveredmethods="0"/>
+      <file name="prisma.service.ts" path="C:\Users\CARLOS\Downloads\civitrack-final2\complaint-service\src\prisma\prisma.service.ts">
+        <metrics statements="5" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="2" coveredmethods="0"/>
+        <line num="1" count="1" type="stmt"/>
+        <line num="2" count="1" type="stmt"/>
+        <line num="5" count="1" type="stmt"/>
+        <line num="7" count="0" type="stmt"/>
+        <line num="11" count="0" type="stmt"/>
+      </file>
+    </package>
+  </project>
+</coverage>
