@@ -7,6 +7,7 @@ import {
   UseGuards,
   HttpCode,
   HttpStatus,
+  HttpException,
 } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
@@ -24,12 +25,18 @@ export class AuthProxyController {
     this.authUrl = config.get<string>('AUTH_SERVICE_URL') || 'http://auth-service:3001';
   }
 
+  private forward(err: any): never {
+    const status = err?.response?.status || 500;
+    const message = err?.response?.data?.message || err.message;
+    throw new HttpException(message, status);
+  }
+
   @Post('register')
   async register(@Body() body: any) {
     const res = await firstValueFrom(
       this.http.post(`${this.authUrl}/auth/register`, body),
-    );
-    return res.data;
+    ).catch(e => { this.forward(e); });
+    return res!.data;
   }
 
   @Post('login')
@@ -37,8 +44,8 @@ export class AuthProxyController {
   async login(@Body() body: any) {
     const res = await firstValueFrom(
       this.http.post(`${this.authUrl}/auth/login`, body),
-    );
-    return res.data;
+    ).catch(e => { this.forward(e); });
+    return res!.data;
   }
 
   @Get('profile')
@@ -48,15 +55,15 @@ export class AuthProxyController {
       this.http.get(`${this.authUrl}/auth/profile`, {
         headers: { Authorization: req.headers.authorization },
       }),
-    );
-    return res.data;
+    ).catch(e => { this.forward(e); });
+    return res!.data;
   }
 
   @Get('health')
   async health() {
     const res = await firstValueFrom(
       this.http.get(`${this.authUrl}/auth/health`),
-    );
-    return res.data;
+    ).catch(e => { this.forward(e); });
+    return res!.data;
   }
 }
