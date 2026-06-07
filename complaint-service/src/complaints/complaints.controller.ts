@@ -126,7 +126,9 @@ export class ComplaintsController {
   // GET /complaints/health
   // ──────────────────────────────────────────
   @Get('health')
+  @UseGuards()
   health() {
     return { status: 'ok', service: 'complaint-service' };
   }
 }
+
